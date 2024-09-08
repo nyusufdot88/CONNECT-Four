@@ -42,5 +42,54 @@ export default class Game {
     }
   }
 
+  startGameLoop(): void {
+    // game loop - runs until the game is over
+    while (!this.board.gameOver) {
+      console.clear();
+      this.board.render();
+      let player = this.board.currentPlayerColor === 'X'
+        ? this.playerX : this.playerO;
+      if (this.isVsAI && player.color === 'O') {
+        this.AImove();
+      } else {
+        this.humanMove(player)
+      }
+    }
+  }
 
+    humanMove(player: Player): void {
+    let move = prompt(`Ange ditt drag ${player.color} ${player.name} - skriv in kolumn: `);
+    let column = +move.trim() - 1;
+    this.board.makeMove(player.color, column);
+  }
+
+  AImove(): void {
+    console.log('Datorn gör sitt drag...');
+    let validMoves = this.getValidColumns();
+    let randomColumn = validMoves[Math.floor(Math.random() * validMoves.length)];
+    this.board.makeMove('O', randomColumn);
+  }
+
+    getValidColumns(): number[] {
+    let validColumns: number[] = [];
+    for (let column = 0; column < this.board.matrix[0].length; column++) {
+      if (this.board.matrix[0][column] === ' ') {
+        validColumns.push(column);
+      }
+    }
+    return validColumns;
+  }
+
+  whoHasWonOnGameOver(): void {
+    // the game is over, tell the player who has one or if we have a draw
+    console.clear();
+    this.board.render();
+    if (this.board.winner) {
+      let winningPlayer = (this.board.winner === 'X' ? this.playerX : this.playerO);
+      console.log(`WOW ${winningPlayer.name} som spelade med ${winningPlayer.color}:  vann!`);
+    }
+    else {
+      console.log('Tyvärr det blev oavgjort...');
+    }
+  }
 }
